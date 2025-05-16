@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DefensysAI Test Client</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            color: #2c3e50;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            white-space: pre-wrap;
+        }
+        .safe {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .danger {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .error {
+            color: #dc3545;
+        }
+        input, button {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 4px;
+        }
+        input {
+            border: 1px solid #ced4da;
+            width: 100%;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0069d9;
+        }
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .spinner {
+            display: inline-block;
+            width: 15px;
+            height: 15px;
+            border: 2px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 5px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>DefensysAI Test Client</h1>
+    <p>This page allows you to test the DefensysAI API endpoints locally.</p>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Phishing URL Detection</h2>
+            <form id="phishing-form">
+                <input type="url" id="url-input" placeholder="Enter URL to check (e.g., https://example.com)" required>
+                <button type="submit" id="check-url-btn">Check URL</button>
+            </form>
+            <div id="phishing-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="card">
+            <h2>Malware Detection</h2>
+            <form id="malware-form">
+                <input type="file" id="file-input">
+                <button type="submit" id="scan-file-btn">Scan File</button>
+            </form>
+            <div id="malware-result" class="result" style="display: none;"></div>
+        </div>
+        
+        <div class="card">
+            <h2>Network Security Analysis</h2>
+            <form id="network-form">
+                <h3>Sample Network Data</h3>
+                <textarea id="network-data" rows="5" style="width: 100%;" placeholder="Enter JSON network data">{
+  "protocol": "TCP",
+  "src_ip": "192.168.1.1",
+  "dst_ip": "10.0.0.1",
+  "src_port": 12345,
+  "dst_port": 80,
+  "packet_size": 1024,
+  "timestamp": 1621234567
+}</textarea>
+                <button type="submit" id="analyze-network-btn">Analyze Network</button>
+            </form>
+            <div id="network-result" class="result" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Base URL for the API
+        const API_BASE_URL = 'http://localhost:8000/api';
+        
+        // Phishing detection
+        document.getElementById('phishing-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const urlInput = document.getElementById('url-input');
+            const checkUrlBtn = document.getElementById('check-url-btn');
+            const resultDiv = document.getElementById('phishing-result');
+            
+            // Validate URL
+            const url = urlInput.value.trim();
+            if (!url) {
+                resultDiv.innerHTML = '<p class="error">Please enter a valid URL</p>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            // Show loading state
+            checkUrlBtn.disabled = true;
+            checkUrlBtn.innerHTML = '<span class="spinner"></span> Checking...';
+            resultDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/phishing`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ url }),
+                });
+                
+                const result = await response.json();
+                
+                // Display result
+                if (result.error) {
+                    resultDiv.innerHTML = `<p class="error">Error: ${result.error}</p>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h4>Result:</h4>
+                        <p class="${result.is_phishing ? 'danger' : 'safe'}">
+                            ${result.is_phishing ? '⚠️ Phishing detected!' : '✅ URL is safe'}
+                        </p>
+                        <p>Confidence: ${(result.confidence * 100).toFixed(2)}%</p>
+                        <p>Status: ${result.status}</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            } finally {
+                // Reset button state
+                checkUrlBtn.disabled = false;
+                checkUrlBtn.innerHTML = 'Check URL';
+                resultDiv.style.display = 'block';
+            }
+        });
+        
+        // Malware detection
+        document.getElementById('malware-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('file-input');
+            const scanFileBtn = document.getElementById('scan-file-btn');
+            const resultDiv = document.getElementById('malware-result');
+            
+            // Validate file
+            if (!fileInput.files || fileInput.files.length === 0) {
+                resultDiv.innerHTML = '<p class="error">Please select a file</p>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            
+            // Show loading state
+            scanFileBtn.disabled = true;
+            scanFileBtn.innerHTML = '<span class="spinner"></span> Scanning...';
+            resultDiv.style.display = 'none';
+            
+            try {
+                // Convert file to base64
+                const fileData = await fileToBase64(file);
+                
+                const response = await fetch(`${API_BASE_URL}/malware`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ file_data: fileData }),
+                });
+                
+                const result = await response.json();
+                
+                // Display result
+                if (result.error) {
+                    resultDiv.innerHTML = `<p class="error">Error: ${result.error}</p>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h4>Result:</h4>
+                        <p class="${result.is_malware ? 'danger' : 'safe'}">
+                            ${result.is_malware ? '⚠️ Malware detected!' : '✅ File is safe'}
+                        </p>
+                        <p>Confidence: ${(result.confidence * 100).toFixed(2)}%</p>
+                        <p>Status: ${result.status}</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            } finally {
+                // Reset button state
+                scanFileBtn.disabled = false;
+                scanFileBtn.innerHTML = 'Scan File';
+                resultDiv.style.display = 'block';
+            }
+        });
+        
+        // Network security analysis
+        document.getElementById('network-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const networkDataInput = document.getElementById('network-data');
+            const analyzeNetworkBtn = document.getElementById('analyze-network-btn');
+            const resultDiv = document.getElementById('network-result');
+            
+            // Validate network data
+            let networkData;
+            try {
+                networkData = JSON.parse(networkDataInput.value);
+            } catch (error) {
+                resultDiv.innerHTML = '<p class="error">Please enter valid JSON network data</p>';
+                resultDiv.style.display = 'block';
+                return;
+            }
+            
+            // Show loading state
+            analyzeNetworkBtn.disabled = true;
+            analyzeNetworkBtn.innerHTML = '<span class="spinner"></span> Analyzing...';
+            resultDiv.style.display = 'none';
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/network`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ network_data: networkData }),
+                });
+                
+                const result = await response.json();
+                
+                // Display result
+                if (result.error) {
+                    resultDiv.innerHTML = `<p class="error">Error: ${result.error}</p>`;
+                } else {
+                    resultDiv.innerHTML = `
+                        <h4>Result:</h4>
+                        <p class="${result.is_attack ? 'danger' : 'safe'}">
+                            ${result.is_attack ? '⚠️ Network attack detected!' : '✅ Network traffic is normal'}
+                        </p>
+                        <p>Confidence: ${(result.confidence * 100).toFixed(2)}%</p>
+                        <p>Status: ${result.status}</p>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+            } finally {
+                // Reset button state
+                analyzeNetworkBtn.disabled = false;
+                analyzeNetworkBtn.innerHTML = 'Analyze Network';
+                resultDiv.style.display = 'block';
+            }
+        });
+        
+        // Helper function to convert file to base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    // Remove the data URL prefix (e.g., "data:application/pdf;base64,")
+                    const base64 = reader.result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+    </script>
+</body>
+</html>
