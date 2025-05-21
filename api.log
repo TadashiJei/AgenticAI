@@ -1,0 +1,269 @@
+2025-05-21 07:51:19,583 - defensys-api-runner - INFO - Starting DefensysAI API server on 127.0.0.1:8000
+2025-05-21 07:51:19,583 - defensys-api-runner - INFO - API documentation available at http://127.0.0.1:8000/api/docs
+2025-05-21 08:20:46,955 - defensys-api - INFO - Request started: GET / from 127.0.0.1
+2025-05-21 08:20:46,957 - defensys-api - INFO - Request completed: GET / - Status: 200 - Time: 0.0028s
+2025-05-21 08:21:05,694 - defensys-api - INFO - Request started: GET /api-docs from 127.0.0.1
+2025-05-21 08:21:05,695 - defensys-api - INFO - Request completed: GET /api-docs - Status: 404 - Time: 0.0010s
+2025-05-21 08:21:59,409 - defensys-api - INFO - Request started: GET /api-docs from 127.0.0.1
+2025-05-21 08:21:59,409 - defensys-api - INFO - Request started: GET /api-docs from 127.0.0.1
+2025-05-21 08:21:59,410 - defensys-api - INFO - Request completed: GET /api-docs - Status: 404 - Time: 0.0011s
+2025-05-21 08:21:59,410 - defensys-api - INFO - Request completed: GET /api-docs - Status: 404 - Time: 0.0007s
+2025-05-21 08:22:34,418 - defensys-api-runner - INFO - Starting DefensysAI API server on 127.0.0.1:8000
+2025-05-21 08:22:34,418 - defensys-api-runner - INFO - API documentation available at http://127.0.0.1:8000/api/docs
+2025-05-21 08:23:03,852 - defensys-api-runner - INFO - Starting DefensysAI API server on 127.0.0.1:8000
+2025-05-21 08:23:03,852 - defensys-api-runner - INFO - API documentation available at http://127.0.0.1:8000/api/docs
+2025-05-21 08:23:12,606 - defensys-api - INFO - Request started: GET /api/docs from 127.0.0.1
+2025-05-21 08:23:12,607 - defensys-api - INFO - Request completed: GET /api/docs - Status: 200 - Time: 0.0015s
+2025-05-21 08:23:13,593 - defensys-api - INFO - Request started: GET /api/openapi.json from 127.0.0.1
+2025-05-21 08:23:13,655 - defensys-api - INFO - Request completed: GET /api/openapi.json - Status: 200 - Time: 0.0624s
+2025-05-21 08:23:54,857 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
+2025-05-21 08:23:54,863 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:23:54,863 - defensys-api.model-loader - ERROR - Error loading phishing model: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:23:54,930 - defensys-api.phishing - ERROR - Error analyzing URL https://tadashijei.com/: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/endpoints/phishing.py", line 69, in analyze_url
+    model = get_phishing_model()
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 118, in get_phishing_model
+    return load_model("phishing", force_reload)
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:23:54,943 - defensys-api - WARNING - HTTP exception: 500 - Error analyzing URL: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:23:54,944 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 500 - Time: 0.0873s
+2025-05-21 08:24:16,196 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
+2025-05-21 08:24:16,199 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:24:16,199 - defensys-api.model-loader - ERROR - Error loading phishing model: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:16,201 - defensys-api.phishing - ERROR - Error analyzing URL https://tadashijei.com/: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/endpoints/phishing.py", line 69, in analyze_url
+    model = get_phishing_model()
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 118, in get_phishing_model
+    return load_model("phishing", force_reload)
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:16,202 - defensys-api - WARNING - HTTP exception: 500 - Error analyzing URL: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:16,203 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 500 - Time: 0.0071s
+2025-05-21 08:24:16,809 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
+2025-05-21 08:24:16,810 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:24:16,810 - defensys-api.model-loader - ERROR - Error loading phishing model: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:16,811 - defensys-api.phishing - ERROR - Error analyzing URL https://tadashijei.com/: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/endpoints/phishing.py", line 69, in analyze_url
+    model = get_phishing_model()
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 118, in get_phishing_model
+    return load_model("phishing", force_reload)
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:16,812 - defensys-api - WARNING - HTTP exception: 500 - Error analyzing URL: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:16,812 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 500 - Time: 0.0032s
+2025-05-21 08:24:17,237 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
+2025-05-21 08:24:17,240 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:24:17,243 - defensys-api.model-loader - ERROR - Error loading phishing model: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:17,244 - defensys-api.phishing - ERROR - Error analyzing URL https://tadashijei.com/: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/endpoints/phishing.py", line 69, in analyze_url
+    model = get_phishing_model()
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 118, in get_phishing_model
+    return load_model("phishing", force_reload)
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:17,252 - defensys-api - WARNING - HTTP exception: 500 - Error analyzing URL: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:17,259 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 500 - Time: 0.0222s
+2025-05-21 08:24:17,537 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
+2025-05-21 08:24:17,538 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:24:17,538 - defensys-api.model-loader - ERROR - Error loading phishing model: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:17,538 - defensys-api.phishing - ERROR - Error analyzing URL https://tadashijei.com/: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/endpoints/phishing.py", line 69, in analyze_url
+    model = get_phishing_model()
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 118, in get_phishing_model
+    return load_model("phishing", force_reload)
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:17,539 - defensys-api - WARNING - HTTP exception: 500 - Error analyzing URL: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:17,539 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 500 - Time: 0.0016s
+2025-05-21 08:24:34,004 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
+2025-05-21 08:24:34,005 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:24:34,006 - defensys-api.model-loader - ERROR - Error loading phishing model: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:34,006 - defensys-api.phishing - ERROR - Error analyzing URL https://tadashijei.com/: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/endpoints/phishing.py", line 69, in analyze_url
+    model = get_phishing_model()
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 118, in get_phishing_model
+    return load_model("phishing", force_reload)
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:34,006 - defensys-api - WARNING - HTTP exception: 500 - Error analyzing URL: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:34,007 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 500 - Time: 0.0026s
+2025-05-21 08:24:34,618 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
+2025-05-21 08:24:34,619 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:24:34,619 - defensys-api.model-loader - ERROR - Error loading phishing model: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:34,619 - defensys-api.phishing - ERROR - Error analyzing URL https://tadashijei.com/: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/endpoints/phishing.py", line 69, in analyze_url
+    model = get_phishing_model()
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 118, in get_phishing_model
+    return load_model("phishing", force_reload)
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:34,630 - defensys-api - WARNING - HTTP exception: 500 - Error analyzing URL: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:34,630 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 500 - Time: 0.0121s
+2025-05-21 08:24:35,141 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
+2025-05-21 08:24:35,141 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:24:35,142 - defensys-api.model-loader - ERROR - Error loading phishing model: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:35,142 - defensys-api.phishing - ERROR - Error analyzing URL https://tadashijei.com/: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+Traceback (most recent call last):
+  File "/Users/jay/TadashiJei/DefensysAI/api/endpoints/phishing.py", line 69, in analyze_url
+    model = get_phishing_model()
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 118, in get_phishing_model
+    return load_model("phishing", force_reload)
+  File "/Users/jay/TadashiJei/DefensysAI/api/utils/model_loader.py", line 99, in load_model
+    model.load(model_path)
+  File "/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/model.py", line 166, in load
+    self.pipeline = joblib.load(path)
+  File "/Users/jay/Library/Python/3.9/lib/python/site-packages/joblib/numpy_pickle.py", line 735, in load
+    with open(filename, "rb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:35,142 - defensys-api - WARNING - HTTP exception: 500 - Error analyzing URL: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models'
+2025-05-21 08:24:35,142 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 500 - Time: 0.0011s
+2025-05-21 08:30:25,011 - defensys-api - INFO - Request started: GET /api/docs from 127.0.0.1
+2025-05-21 08:30:25,013 - defensys-api - INFO - Request completed: GET /api/docs - Status: 200 - Time: 0.0029s
+2025-05-21 08:30:25,551 - defensys-api - INFO - Request started: GET /api/openapi.json from 127.0.0.1
+2025-05-21 08:30:25,628 - defensys-api - INFO - Request completed: GET /api/openapi.json - Status: 200 - Time: 0.0778s
+2025-05-21 08:30:49,383 - defensys-api - INFO - Request started: POST /api/phishing/analyze from 127.0.0.1
+2025-05-21 08:30:49,390 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:30:49,390 - defensys-api.model-loader - WARNING - phishing model files not found at /Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models, using demonstration mode
+2025-05-21 08:30:49,390 - defensys-api.model-loader - INFO - Creating demonstration phishing model
+2025-05-21 08:30:49,390 - defensys-api.model-loader - INFO - Loaded phishing model in 0.00 seconds
+2025-05-21 08:30:50,194 - defensys-api - INFO - Request completed: POST /api/phishing/analyze - Status: 200 - Time: 0.8116s
+2025-05-21 08:30:50,195 - defensys-api.phishing - INFO - Phishing prediction: URL=https://tadashijei.com/, is_phishing=False, confidence=0.2776
+2025-05-21 08:31:16,070 - defensys-api - INFO - Request started: POST /api/phishing/analyze from 127.0.0.1
+2025-05-21 08:31:16,779 - defensys-api - INFO - Request completed: POST /api/phishing/analyze - Status: 200 - Time: 0.7088s
+2025-05-21 08:31:16,779 - defensys-api.phishing - INFO - Phishing prediction: URL=https://breachedforum.com/, is_phishing=False, confidence=0.2573
+2025-05-21 08:31:24,341 - defensys-api - INFO - Request started: POST /api/phishing/analyze from 127.0.0.1
+2025-05-21 08:31:24,343 - defensys-api - INFO - Request completed: POST /api/phishing/analyze - Status: 422 - Time: 0.0022s
+2025-05-21 08:33:11,442 - defensys-api-runner - INFO - Starting DefensysAI API server on 127.0.0.1:8000
+2025-05-21 08:33:11,443 - defensys-api-runner - INFO - API documentation available at http://127.0.0.1:8000/api/docs
+2025-05-21 08:33:21,671 - defensys-api - INFO - Request started: GET /api/docs from 127.0.0.1
+2025-05-21 08:33:21,692 - defensys-api - INFO - Request completed: GET /api/docs - Status: 200 - Time: 0.0213s
+2025-05-21 08:33:22,188 - defensys-api - INFO - Request started: GET /api/openapi.json from 127.0.0.1
+2025-05-21 08:33:22,288 - defensys-api - INFO - Request completed: GET /api/openapi.json - Status: 200 - Time: 0.1008s
+2025-05-21 08:33:37,772 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
+2025-05-21 08:33:37,781 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:33:37,782 - defensys-api.model-loader - WARNING - phishing model files not found at /Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models, using demonstration mode
+2025-05-21 08:33:37,782 - defensys-api.model-loader - INFO - Creating demonstration phishing model
+2025-05-21 08:33:37,786 - defensys-api.model-loader - INFO - Loaded phishing model in 0.00 seconds
+2025-05-21 08:33:38,563 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 200 - Time: 0.7921s
+2025-05-21 08:40:04,280 - defensys-api-runner - INFO - Starting DefensysAI API server on 127.0.0.1:8000
+2025-05-21 08:40:04,280 - defensys-api-runner - INFO - API documentation available at http://127.0.0.1:8000/api/docs
+2025-05-21 08:40:11,778 - defensys-api - INFO - Request started: GET /api/docs from 127.0.0.1
+2025-05-21 08:40:11,778 - defensys-api - INFO - Request completed: GET /api/docs - Status: 200 - Time: 0.0005s
+2025-05-21 08:40:12,295 - defensys-api - INFO - Request started: GET /api/openapi.json from 127.0.0.1
+2025-05-21 08:40:12,367 - defensys-api - INFO - Request completed: GET /api/openapi.json - Status: 200 - Time: 0.0719s
+2025-05-21 08:40:29,054 - defensys-api - INFO - Request started: POST /api/phishing/analyze from 127.0.0.1
+2025-05-21 08:40:29,067 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:40:29,067 - defensys-api.model-loader - WARNING - phishing model files not found at /Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models, using demonstration mode
+2025-05-21 08:40:29,067 - defensys-api.model-loader - INFO - Creating demonstration phishing model
+2025-05-21 08:40:29,068 - defensys-api.model-loader - INFO - Loaded phishing model in 0.00 seconds
+2025-05-21 08:40:29,069 - defensys-api - INFO - Request completed: POST /api/phishing/analyze - Status: 200 - Time: 0.0152s
+2025-05-21 08:40:29,071 - defensys-api.phishing - INFO - Phishing prediction: URL=https://tadashijei.com/, is_phishing=False, confidence=0.3481
+2025-05-21 08:40:31,614 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
+2025-05-21 08:40:31,646 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 200 - Time: 0.0327s
