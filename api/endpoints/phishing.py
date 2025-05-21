@@ -5,10 +5,12 @@ API endpoint for phishing detection using the DefensysAI phishing model.
 """
 import time
 import logging
-from typing import Dict, Any, Optional, List
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Query, Path
+from typing import Dict, Any, Optional, List, Union
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Query, Path, Request
 from pydantic import AnyHttpUrl
+from starlette.concurrency import run_in_threadpool
 
+# Import API components
 from api.models.schemas import (
     PhishingDetectionRequest,
     PhishingDetectionResponse,
@@ -16,6 +18,11 @@ from api.models.schemas import (
 )
 from api.utils.model_loader import get_phishing_model
 from models.phishing_detection.model import Model as PhishingModel
+
+# Import optimization & configuration utilities
+from api.utils.optimization import cache_response, cleanup_cache, get_resource_config
+from api.utils.preprocessing import normalize_url, extract_url_features
+from api.config import MAX_BATCH_SIZE, FEATURE_FLAGS
 
 # Configure logging
 logger = logging.getLogger("defensys-api.phishing")
@@ -39,11 +46,13 @@ def get_threat_level(score: float) -> str:
     response_model=PhishingDetectionResponse,
     responses={
         400: {"model": ErrorResponse, "description": "Bad request"},
+        429: {"model": ErrorResponse, "description": "Rate limit exceeded"},
         500: {"model": ErrorResponse, "description": "Internal server error"}
     },
     summary="Analyze a URL for phishing indicators",
-    description="Analyze a URL for phishing indicators using machine learning and optionally verify against PhishTank database."
+    description="Analyze a URL for phishing indicators using machine learning with optimized performance."
 )
+@cache_response(ttl=300)  # Cache responses for 5 minutes
 async def analyze_url(
     request: PhishingDetectionRequest,
     background_tasks: BackgroundTasks
@@ -58,32 +67,69 @@ async def analyze_url(
     start_time = time.time()
     url = str(request.url)
     
+    # Normalize URL to improve cache hits
+    normalized_url = normalize_url(url)
+    
     try:
-        # Get the phishing model
-        model = get_phishing_model()
+        # Run prediction in threadpool to avoid blocking the event loop
+        async def predict():
+            # Get the phishing model
+            model = get_phishing_model()
+            
+            # Extract features from the URL using common preprocessing
+            preprocessed_features = extract_url_features(normalized_url)
+            
+            # Make direct predictions using the local model only
+            predictions = await run_in_threadpool(
+                lambda: model.predict(X=[preprocessed_features], original_urls=[normalized_url])
+            )
+            return predictions[0]
         
-        # Make direct predictions using the local model only
-        predictions = model.predict(X=[None], original_urls=[url])
-        prediction = predictions[0]
+        # Run prediction
+        prediction = await predict()
         
-        # Get detailed analysis if requested
+        # Get detailed analysis if requested (also run in threadpool)
         analysis = None
         if request.detailed_analysis:
-            # Extract URL features and get feature importance
-            features = model.extract_features(url)
+            async def get_detailed_analysis():
+                # Get model again to ensure we have it in this thread
+                model = get_phishing_model()
+                
+                # Extract URL features using common preprocessing utility
+                features = await run_in_threadpool(
+                    lambda: model.extract_features(normalized_url)
+                )
+                
+                # Get feature importance (top 10 features)
+                importance = {}
+                if hasattr(model, "get_feature_importance"):
+                    importance = await run_in_threadpool(
+                        lambda: model.get_feature_importance(top_n=10)
+                    )
+                
+                # Get suspicious terms detection
+                suspicious_terms = await run_in_threadpool(
+                    lambda: model.contains_suspicious_terms(normalized_url)
+                )
+                
+                # Calculate entropy if available
+                entropy = None
+                if hasattr(model, "calculate_url_entropy"):
+                    entropy = await run_in_threadpool(
+                        lambda: model.calculate_url_entropy(normalized_url)
+                    )
+                
+                return {
+                    "features": features,
+                    "feature_importance": importance,
+                    "url_length": len(normalized_url),
+                    "suspicious_terms": suspicious_terms,
+                    "entropy": entropy,
+                    "normalized_url": normalized_url != url  # Indicate if URL was normalized
+                }
             
-            # Get feature importance (top 10 features)
-            importance = {}
-            if hasattr(model, "get_feature_importance"):
-                importance = model.get_feature_importance(top_n=10)
-            
-            analysis = {
-                "features": features,
-                "feature_importance": importance,
-                "url_length": len(url),
-                "suspicious_terms": model.contains_suspicious_terms(url),
-                "entropy": model.calculate_url_entropy(url) if hasattr(model, "calculate_url_entropy") else None,
-            }
+            # Get detailed analysis
+            analysis = await get_detailed_analysis()
         
         # Calculate detection time
         detection_time = time.time() - start_time
@@ -120,11 +166,13 @@ async def analyze_url(
     response_model=List[PhishingDetectionResponse],
     responses={
         400: {"model": ErrorResponse, "description": "Bad request"},
+        429: {"model": ErrorResponse, "description": "Rate limit exceeded"},
         500: {"model": ErrorResponse, "description": "Internal server error"}
     },
     summary="Batch analyze multiple URLs",
-    description="Analyze multiple URLs in a single request for efficient processing."
+    description="Analyze multiple URLs in a single request with optimized parallel processing."
 )
+@cache_response(ttl=600)  # Cache batch results for 10 minutes
 async def batch_analyze(
     urls: List[AnyHttpUrl] = Query(..., description="URLs to analyze"),
     detailed_analysis: bool = Query(False, description="Whether to include detailed analysis")
@@ -132,42 +180,52 @@ async def batch_analyze(
     """
     Analyze multiple URLs in a single request.
     
-    This endpoint is optimized for analyzing multiple URLs efficiently.
-    It uses the same model and verification options as the single URL endpoint.
+    This endpoint is optimized for analyzing multiple URLs efficiently with parallel processing.
+    It uses the same model and preprocessing as the single URL endpoint.
     """
-    if len(urls) > 50:
+    # Get max batch size from configuration
+    if len(urls) > MAX_BATCH_SIZE:
         raise HTTPException(
             status_code=400,
-            detail="Maximum of 50 URLs can be analyzed in a single batch request"
+            detail=f"Maximum of {MAX_BATCH_SIZE} URLs can be analyzed in a single batch request"
         )
     
-    results = []
+    # Process URLs in parallel using asyncio.gather for better performance
+    import asyncio
     
-    for url in urls:
-        # Create a single request and use the analyze_url endpoint
+    async def process_single_url(url):
+        # Create a request object
         request = PhishingDetectionRequest(
             url=url,
             detailed_analysis=detailed_analysis
         )
         
         try:
-            # Reuse the analyze_url function for each URL
-            result = await analyze_url(request, BackgroundTasks())
-            results.append(result)
-        except HTTPException as e:
+            # Use the analyze_url function but bypass its caching
+            # to avoid double-caching (batch endpoint already has its own cache)
+            bt = BackgroundTasks()
+            result = await analyze_url.__wrapped__(request, bt)
+            return result
+        except Exception as e:
             # If one URL fails, add error response but continue with others
             logger.warning(f"Error analyzing URL {url} in batch: {str(e)}")
-            results.append(
-                PhishingDetectionResponse(
-                    status="error",
-                    message=f"Error analyzing URL: {str(e)}",
-                    url=str(url),
-                    is_phishing=False,
-                    confidence=0.0,
-                    threat_level="Unknown",
-                    detection_time=0.0
-                )
+            return PhishingDetectionResponse(
+                status="error",
+                message=f"Error analyzing URL: {str(e)}",
+                url=str(url),
+                is_phishing=False,
+                confidence=0.0,
+                threat_level="Unknown",
+                detection_time=0.0
             )
+    
+    # Process all URLs in parallel
+    start_time = time.time()
+    results = await asyncio.gather(*[process_single_url(url) for url in urls])
+    
+    # Log batch processing time
+    total_time = time.time() - start_time
+    logger.info(f"Batch processed {len(urls)} URLs in {total_time:.2f} seconds")
     
     return results
 
@@ -176,13 +234,16 @@ async def batch_analyze(
     response_model=PhishingDetectionResponse,
     responses={
         400: {"model": ErrorResponse, "description": "Bad request"},
+        429: {"model": ErrorResponse, "description": "Rate limit exceeded"},
         500: {"model": ErrorResponse, "description": "Internal server error"}
     },
     summary="Quick check URL for phishing",
-    description="Simplified endpoint to check if a URL is a phishing site."
+    description="Optimized endpoint to quickly check if a URL is a phishing site."
 )
+@cache_response(ttl=3600)  # Cache quick check results for 1 hour (longer cache for simpler endpoint)
 async def quick_check(
-    url: str = Path(..., description="URL to check (can be path-encoded)")
+    url: str = Path(..., description="URL to check (can be path-encoded)"),
+    request: Request = None
 ):
     """
     Quick check if a URL is a phishing site.

@@ -267,3 +267,39 @@ FileNotFoundError: [Errno 2] No such file or directory: '/Users/jay/TadashiJei/D
 2025-05-21 08:40:29,071 - defensys-api.phishing - INFO - Phishing prediction: URL=https://tadashijei.com/, is_phishing=False, confidence=0.3481
 2025-05-21 08:40:31,614 - defensys-api - INFO - Request started: GET /api/phishing/check/https://tadashijei.com from 127.0.0.1
 2025-05-21 08:40:31,646 - defensys-api - INFO - Request completed: GET /api/phishing/check/https://tadashijei.com - Status: 200 - Time: 0.0327s
+2025-05-21 08:50:16,032 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:50:16,038 - defensys-api.model-loader - WARNING - phishing model files not found at /Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models, using demonstration mode
+2025-05-21 08:50:16,039 - defensys-api.model-loader - INFO - Creating demonstration phishing model
+2025-05-21 08:50:16,039 - defensys-api.model-loader - INFO - Loaded phishing model in 0.00 seconds
+2025-05-21 08:50:16,039 - defensys-api.optimization - INFO - Preloaded phishing model
+2025-05-21 08:50:16,039 - defensys-api.model-loader - INFO - Loading malware model (force_reload=False)
+2025-05-21 08:50:16,043 - defensys-api.model-loader - WARNING - malware model files not found at /Users/jay/TadashiJei/DefensysAI/models/malware_detection/trained_models, using demonstration mode
+2025-05-21 08:50:16,043 - defensys-api.model-loader - INFO - Creating demonstration malware model
+2025-05-21 08:50:16,043 - defensys-api.model-loader - INFO - Loaded malware model in 0.00 seconds
+2025-05-21 08:50:16,043 - defensys-api.optimization - INFO - Preloaded malware model
+2025-05-21 08:50:16,044 - defensys-api.model-loader - INFO - Loading network model (force_reload=False)
+2025-05-21 08:50:16,044 - defensys-api.model-loader - WARNING - network model files not found at /Users/jay/TadashiJei/DefensysAI/models/network_security/trained_models, using demonstration mode
+2025-05-21 08:50:16,044 - defensys-api.model-loader - INFO - Creating demonstration network model
+2025-05-21 08:50:16,044 - defensys-api.model-loader - INFO - Loaded network model in 0.00 seconds
+2025-05-21 08:50:16,044 - defensys-api.optimization - INFO - Preloaded network model
+2025-05-21 08:50:16,050 - defensys-api.optimization - INFO - Cold-start initialization completed in 0.02 seconds
+2025-05-21 08:50:16,073 - defensys-api - INFO - Starting DefensysAI API server
+2025-05-21 08:51:13,162 - defensys-api - INFO - Shutting down DefensysAI API server
+2025-05-21 08:51:21,317 - defensys-api.model-loader - INFO - Loading phishing model (force_reload=False)
+2025-05-21 08:51:21,318 - defensys-api.model-loader - WARNING - phishing model files not found at /Users/jay/TadashiJei/DefensysAI/models/phishing_detection/trained_models, using demonstration mode
+2025-05-21 08:51:21,318 - defensys-api.model-loader - INFO - Creating demonstration phishing model
+2025-05-21 08:51:21,318 - defensys-api.model-loader - INFO - Loaded phishing model in 0.00 seconds
+2025-05-21 08:51:21,318 - defensys-api.optimization - INFO - Preloaded phishing model
+2025-05-21 08:51:21,318 - defensys-api.model-loader - INFO - Loading malware model (force_reload=False)
+2025-05-21 08:51:21,318 - defensys-api.model-loader - WARNING - malware model files not found at /Users/jay/TadashiJei/DefensysAI/models/malware_detection/trained_models, using demonstration mode
+2025-05-21 08:51:21,318 - defensys-api.model-loader - INFO - Creating demonstration malware model
+2025-05-21 08:51:21,318 - defensys-api.model-loader - INFO - Loaded malware model in 0.00 seconds
+2025-05-21 08:51:21,318 - defensys-api.optimization - INFO - Preloaded malware model
+2025-05-21 08:51:21,321 - defensys-api.model-loader - INFO - Loading network model (force_reload=False)
+2025-05-21 08:51:21,321 - defensys-api.model-loader - WARNING - network model files not found at /Users/jay/TadashiJei/DefensysAI/models/network_security/trained_models, using demonstration mode
+2025-05-21 08:51:21,321 - defensys-api.model-loader - INFO - Creating demonstration network model
+2025-05-21 08:51:21,322 - defensys-api.model-loader - INFO - Loaded network model in 0.00 seconds
+2025-05-21 08:51:21,322 - defensys-api.optimization - INFO - Preloaded network model
+2025-05-21 08:51:21,322 - defensys-api.optimization - INFO - Cold-start initialization completed in 0.00 seconds
+2025-05-21 08:51:21,407 - defensys-api - INFO - Starting DefensysAI API server
+2025-05-21 09:05:29,116 - defensys-api - INFO - Shutting down DefensysAI API server

@@ -1,8 +1,12 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, ReactNode } from "react"
 
-export function GlitchEffect() {
+interface GlitchEffectProps {
+  children: ReactNode;
+}
+
+export function GlitchEffect({ children }: GlitchEffectProps) {
   const [glitchActive, setGlitchActive] = useState(false)
 
   useEffect(() => {
@@ -28,15 +32,19 @@ export function GlitchEffect() {
     }
   }, [])
 
-  if (!glitchActive) return null
-
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none">
-      <div className="absolute inset-0 bg-cyan-500/5 animate-pulse"></div>
-      <div className="absolute top-1/4 left-0 right-0 h-px bg-cyan-400/30 animate-glitch-h-1"></div>
-      <div className="absolute top-1/3 left-0 right-0 h-px bg-orange-400/30 animate-glitch-h-2"></div>
-      <div className="absolute top-1/2 left-0 right-0 h-px bg-purple-400/30 animate-glitch-h-3"></div>
-      <div className="absolute top-2/3 left-0 right-0 h-px bg-cyan-400/30 animate-glitch-h-4"></div>
+    <div className="relative">
+      {children}
+      
+      {glitchActive && (
+        <div className="fixed inset-0 z-50 pointer-events-none">
+          <div className="absolute inset-0 bg-cyan-500/5 animate-pulse"></div>
+          <div className="absolute top-1/4 left-0 right-0 h-px bg-cyan-400/30 animate-glitch-h-1"></div>
+          <div className="absolute top-1/3 left-0 right-0 h-px bg-orange-400/30 animate-glitch-h-2"></div>
+          <div className="absolute top-1/2 left-0 right-0 h-px bg-purple-400/30 animate-glitch-h-3"></div>
+          <div className="absolute top-2/3 left-0 right-0 h-px bg-cyan-400/30 animate-glitch-h-4"></div>
+        </div>
+      )}
     </div>
   )
 }

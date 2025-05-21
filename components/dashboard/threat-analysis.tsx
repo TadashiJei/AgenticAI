@@ -1,11 +1,274 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+"use client"
+
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { BarChart3, PieChart, Activity, AlertTriangle, Shield, Network, FileWarning, ArrowRight } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { useToast } from "@/components/ui/use-toast"
+import { Progress } from "@/components/ui/progress"
+import { Skeleton } from "@/components/ui/skeleton"
+import { BarChart3, PieChart, Activity, AlertTriangle, Shield, Network, FileWarning, ArrowRight, Check, X, Link as LinkIcon, ExternalLink, Globe, Clock, Cpu } from "lucide-react"
+
+// Form schema for URL validation
+const urlCheckSchema = z.object({
+  url: z.string().url("Please enter a valid URL including http:// or https://"),
+});
+
+type UrlCheckFormValues = z.infer<typeof urlCheckSchema>;
+
+interface PhishingResult {
+  url: string;
+  is_phishing: boolean;
+  confidence_score: number;
+  threat_level: string;
+  analysis: {
+    domain_age_days?: number;
+    suspicious_keywords?: boolean;
+    tls_certificate_valid?: boolean;
+    misleading_domain?: boolean;
+    suspicious_redirects?: boolean;
+    blacklisted?: boolean;
+    similar_to_known_phishing?: boolean;
+  };
+  time_analyzed: string;
+}
 
 export default function ThreatAnalysis() {
+  const { toast } = useToast();
+  const [isChecking, setIsChecking] = useState(false);
+  const [phishingResult, setPhishingResult] = useState<PhishingResult | null>(null);
+  const [recentScans, setRecentScans] = useState<PhishingResult[]>([]);
+
+  const form = useForm<UrlCheckFormValues>({
+    resolver: zodResolver(urlCheckSchema),
+    defaultValues: {
+      url: "",
+    },
+  });
+
+  async function onSubmit(values: UrlCheckFormValues) {
+    setIsChecking(true);
+    
+    try {
+      // Call the phishing detection API
+      const response = await fetch("/api/phishing/check", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("authToken") || sessionStorage.getItem("authToken")}`
+        },
+        body: JSON.stringify({
+          url: values.url,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to analyze URL. Please try again.");
+      }
+
+      const data = await response.json();
+      setPhishingResult(data);
+      
+      // Add to recent scans
+      setRecentScans(prev => [data, ...prev].slice(0, 5));
+
+      // Reset form
+      form.reset();
+    } catch (error) {
+      console.error("URL check error:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+      });
+    } finally {
+      setIsChecking(false);
+    }
+  }
+  
+  // Helper function to determine color based on confidence score
+  const getConfidenceColor = (score: number) => {
+    if (score >= 80) return "text-red-500 border-red-500/50";
+    if (score >= 60) return "text-orange-500 border-orange-500/50";
+    if (score >= 40) return "text-yellow-500 border-yellow-500/50";
+    return "text-green-500 border-green-500/50";
+  };
+  
+  // Helper function to determine status badge
+  const getStatusBadge = (threatLevel: string) => {
+    switch (threatLevel.toLowerCase()) {
+      case "critical":
+        return <Badge className="bg-red-500/20 text-red-500 hover:bg-red-500/20">Critical</Badge>;
+      case "high":
+        return <Badge className="bg-orange-500/20 text-orange-500 hover:bg-orange-500/20">High</Badge>;
+      case "medium":
+        return <Badge className="bg-yellow-500/20 text-yellow-500 hover:bg-yellow-500/20">Medium</Badge>;
+      case "low":
+        return <Badge className="bg-green-500/20 text-green-500 hover:bg-green-500/20">Low</Badge>;
+      default:
+        return <Badge className="bg-gray-500/20 text-gray-500 hover:bg-gray-500/20">Unknown</Badge>;
+    }
+  };
   return (
     <div className="space-y-6">
+      {/* URL Phishing Check Tool */}
+      <Card className="border-gray-800 bg-black/60 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-xl font-medium text-cyan-400 flex items-center gap-2">
+            <Shield className="h-5 w-5" />
+            Phishing URL Scanner
+          </CardTitle>
+          <CardDescription className="text-gray-400">
+            Check if a URL is potentially malicious or connected to phishing campaigns.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <div className="flex space-x-2">
+              <div className="flex-1">
+                <FormField
+                  control={form.control}
+                  name="url"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="flex items-center">
+                        <LinkIcon className="mr-2 h-4 w-4 text-gray-400" />
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="https://example.com"
+                            className="bg-gray-900/60 border-gray-700 text-white placeholder:text-gray-500 focus:border-cyan-400 focus:ring-cyan-400/20"
+                            disabled={isChecking}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage className="text-red-400 text-xs mt-1" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <Button 
+                type="submit" 
+                disabled={isChecking}
+                className="bg-gradient-to-r from-cyan-500 to-purple-600 hover:from-cyan-600 hover:to-purple-700"
+              >
+                {isChecking ? "Analyzing..." : "Check URL"}
+              </Button>
+            </div>
+          </form>
+
+          {isChecking && (
+            <div className="mt-4 p-4 border border-gray-800 rounded-md bg-gray-900/30">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-sm text-gray-400">Analyzing URL...</p>
+                <Skeleton className="h-4 w-4 rounded-full bg-gray-700" />
+              </div>
+              <div className="relative h-1 w-full overflow-hidden rounded-full bg-gray-800">
+                <div
+                  className="h-full bg-gradient-to-r from-cyan-500 to-purple-600 transition-all"
+                  style={{ width: '45%' }}
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <Skeleton className="h-12 w-full rounded-md bg-gray-800" />
+                <Skeleton className="h-12 w-full rounded-md bg-gray-800" />
+                <Skeleton className="h-12 w-full rounded-md bg-gray-800" />
+                <Skeleton className="h-12 w-full rounded-md bg-gray-800" />
+              </div>
+            </div>
+          )}
+
+          {phishingResult && !isChecking && (
+            <div className="mt-4 border border-gray-800 rounded-md overflow-hidden">
+              <div className={`p-4 ${phishingResult.is_phishing ? 'bg-red-900/20' : 'bg-green-900/20'}`}>
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h3 className="text-lg font-medium text-white">{new URL(phishingResult.url).hostname}</h3>
+                    <p className="text-sm text-gray-400 flex items-center">
+                      <Globe className="inline mr-1 h-3 w-3" />
+                      {phishingResult.url}
+                    </p>
+                  </div>
+                  <div className="flex items-center">
+                    <div className={`h-10 w-10 rounded-full ${phishingResult.is_phishing ? 'bg-red-500/20' : 'bg-green-500/20'} flex items-center justify-center`}>
+                      {phishingResult.is_phishing ? (
+                        <X className="h-5 w-5 text-red-500" />
+                      ) : (
+                        <Check className="h-5 w-5 text-green-500" />
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 bg-gray-900/40 border-t border-gray-800">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <p className="text-sm text-gray-400">Threat Level:</p>
+                      {getStatusBadge(phishingResult.threat_level)}
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-sm text-gray-400">Confidence Score:</p>
+                      <Badge variant="outline" className={getConfidenceColor(phishingResult.confidence_score)}>
+                        {phishingResult.confidence_score}/100
+                      </Badge>
+                    </div>
+                    <div className="flex justify-between">
+                      <p className="text-sm text-gray-400">Time Analyzed:</p>
+                      <p className="text-sm text-gray-300 flex items-center">
+                        <Clock className="inline mr-1 h-3 w-3" />
+                        {new Date(phishingResult.time_analyzed).toLocaleString()}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {phishingResult.analysis.domain_age_days !== undefined && (
+                      <div className="flex justify-between">
+                        <p className="text-sm text-gray-400">Domain Age:</p>
+                        <p className="text-sm text-gray-300">{phishingResult.analysis.domain_age_days} days</p>
+                      </div>
+                    )}
+                    {phishingResult.analysis.suspicious_keywords !== undefined && (
+                      <div className="flex justify-between">
+                        <p className="text-sm text-gray-400">Suspicious Keywords:</p>
+                        <Badge className={phishingResult.analysis.suspicious_keywords ? "bg-red-500/20 text-red-500" : "bg-green-500/20 text-green-500"}>
+                          {phishingResult.analysis.suspicious_keywords ? "Detected" : "Not Detected"}
+                        </Badge>
+                      </div>
+                    )}
+                    {phishingResult.analysis.blacklisted !== undefined && (
+                      <div className="flex justify-between">
+                        <p className="text-sm text-gray-400">Blacklisted:</p>
+                        <Badge className={phishingResult.analysis.blacklisted ? "bg-red-500/20 text-red-500" : "bg-green-500/20 text-green-500"}>
+                          {phishingResult.analysis.blacklisted ? "Yes" : "No"}
+                        </Badge>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-gray-800">
+                  <p className="text-sm text-gray-400 mb-2">Verdict:</p>
+                  <p className="text-sm text-gray-300">
+                    {phishingResult.is_phishing 
+                      ? "This URL shows characteristics commonly associated with phishing websites. Proceed with extreme caution."
+                      : "This URL appears to be legitimate based on our analysis. However, always remain vigilant."}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Threat Heatmap */}
         <Card className="border-gray-800 bg-black/60 backdrop-blur-sm">
@@ -334,6 +597,65 @@ export default function ThreatAnalysis() {
                   <button className="text-cyan-400 hover:text-cyan-300 text-sm">View Details</button>
                 </TableCell>
               </TableRow>
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Card className="border-gray-800 bg-black/60 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-xl font-medium text-cyan-400 flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5" />
+            Recent URL Scans
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow className="border-gray-800">
+                <TableHead className="text-gray-400">URL</TableHead>
+                <TableHead className="text-gray-400">Type</TableHead>
+                <TableHead className="text-gray-400">Severity</TableHead>
+                <TableHead className="text-gray-400">Status</TableHead>
+                <TableHead className="text-gray-400 text-right">Action</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recentScans.length > 0 ? (
+                recentScans.map((scan, index) => (
+                  <TableRow key={index} className="border-gray-800">
+                    <TableCell className="font-medium truncate max-w-[150px]" title={scan.url}>
+                      {new URL(scan.url).hostname}
+                    </TableCell>
+                    <TableCell>Phishing Check</TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={getConfidenceColor(scan.confidence_score)}>
+                        {scan.confidence_score}/100
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(scan.threat_level)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <a 
+                        href={scan.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer" 
+                        className="text-cyan-400 hover:text-cyan-300 text-sm flex items-center justify-end"
+                      >
+                        <span className="mr-1">Visit</span>
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6 text-gray-500">
+                    No URL scans performed yet. Use the scanner above to check suspicious URLs.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
